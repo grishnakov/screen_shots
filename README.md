@@ -87,7 +87,16 @@ The AI model that reads the frames is accessed through [OpenRouter](https://open
 1. Go to **<https://openrouter.ai>** and sign up (or log in).
 2. Add money to your account on the **Credits** page: <https://openrouter.ai/settings/credits>.
    - OpenRouter accepts major credit cards, AliPay and crypto (USDC). Card payments carry a fee of 5.5% with a $0.80 minimum, so very small top-ups are proportionally more expensive.
-   - **This tool is cheap.** As measured on a full season of 14 episodes, the AI cost was roughly **$0.50 per season**, or about **$0.003 per screenshot found**. Adding **$5** is plenty for several seasons.
+   - **This tool is cheap.** Estimated AI cost (only the online `verify` and `refine` stages cost money; everything else runs on your computer):
+
+     | | Estimate |
+     |---|---|
+     | Per hour of video | about **$0.09** (measured range $0.06–$0.12 across episodes) |
+     | A 9-hour season | about **$0.80** (roughly $0.55–$1.05) |
+     | Per screenshot found | about **$0.003** |
+
+     These figures come from a test on a 5.6-hour season (14 episodes, 155 screenshots) with the default `deepseek/deepseek-v4.1-flash` model. The cost was worked out from OpenRouter's reported per-request prices, not from a bill. Footage with many screens costs more, and OpenRouter prices can change, so treat the numbers as a rough guide and check your balance on the Credits page after the first episode.
+   - Adding **$5** is plenty for several seasons. Remember that card top-ups carry the fee above.
    - Without credit the requests are refused (you will see a `402` error or "insufficient credits").
 3. Open **<https://openrouter.ai/workspaces/default/keys>** and **generate an API key**. Give it any name you like, for example `screenscan`.
 4. **Copy the key immediately** and keep it somewhere safe. It starts with `sk-or-`. You may not be able to view it again later; if you lose it, create a new one.
