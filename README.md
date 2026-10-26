@@ -37,7 +37,7 @@ Most of the work happens on your own computer. Only a small number of still imag
 
 ### 1. What you need
 
-- A **Mac with Apple silicon**, a **Linux** machine, or Windows via WSL. Linux with an NVIDIA GPU is the fastest and the best tested. **macOS has not been tested yet**, so expect to report problems.
+- A **Windows 10/11** PC, a **Mac with Apple silicon**, or a **Linux** machine. A computer with an NVIDIA graphics card is by far the fastest (keep its driver up to date); without one everything still works, just more slowly. Linux with an NVIDIA GPU is the best tested. **Windows and macOS have not been tested as much**, so expect to report problems.
 - About **20–25 GB of free disk space per season** for intermediate files (sampled frames and so on), on top of the space your video files take.
 - An internet connection. The first run downloads two AI models (several GB) from Hugging Face.
 - The episodes as video files (`.mkv`). **You must provide these yourself; they are not included.**
@@ -46,6 +46,15 @@ Most of the work happens on your own computer. Only a small number of still imag
 ### 2. Install `git` and `uv`
 
 `uv` is the tool that installs Python and every library for you. You do not need to install Python yourself.
+
+**On Windows**, open **PowerShell** (press the Windows key, type `PowerShell`, press Enter) and run:
+
+```powershell
+winget install --id Git.Git -e
+winget install --id astral-sh.uv -e
+```
+
+Then **close PowerShell and open a new window**, so `git` and `uv` are found. (If `winget` is missing, install uv with `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"` and git from <https://git-scm.com/download/win>.) Use PowerShell for every command in this guide.
 
 **On a Mac**, open the **Terminal** app and run:
 
@@ -110,7 +119,7 @@ The project comes with a settings file called **`.env.template`**. It has no key
 > ## ⚠️ Step A: **rename `.env.template` to `.env`**
 >
 > ```bash
-> mv .env.template .env
+> mv .env.template .env     # works in PowerShell, macOS and Linux
 > ```
 >
 > ## ⚠️ Step B: **only after that**, put your API key into `.env`
@@ -118,6 +127,7 @@ The project comes with a settings file called **`.env.template`**. It has no key
 > Open the new `.env` file in any text editor:
 >
 > ```bash
+> notepad .env        # Windows
 > open -e .env        # macOS: opens it in TextEdit
 > nano .env           # Linux (or macOS): Ctrl+O then Enter to save, Ctrl+X to exit
 > ```
@@ -140,7 +150,8 @@ Common mistakes:
 
 - **Pasting the key into `.env.template`.** That file is the blank template and is not read by the program. The program only reads a file named exactly `.env`.
 - **Forgetting the dot.** The name is `.env`, not `env` and not `env.txt`.
-- **Not seeing the file.** Names that start with a dot are hidden in Finder and most file browsers. Use the Terminal commands above, or press `Cmd`+`Shift`+`.` in Finder to show hidden files.
+- **Windows adding `.txt`.** If you create or rename the file in File Explorer or save it from Notepad, Windows may quietly call it `.env.txt`. Check with `dir .env*` in PowerShell; if it shows `.env.txt`, run `mv .env.txt .env`.
+- **Not seeing the file.** Names that start with a dot are hidden in Finder and most file browsers on Mac and Linux. Use the Terminal commands above, or press `Cmd`+`Shift`+`.` in Finder to show hidden files.
 - **Spaces or quotes around the key.** It must look exactly like `VLM_API_KEY=sk-or-...`.
 
 The other two lines in `.env` (`VLM_BASE_URL` and `VLM_MODEL`) are already set to OpenRouter and the `deepseek/deepseek-v4.1-flash` model. You do not need to change them.
@@ -169,25 +180,25 @@ Dates use `YYYY-MM-DD` or may be empty. Each season/episode pair must be unique.
 
 ### 7. Run it
 
-Pick the season with `SEASON=`. To try it on a single episode first (recommended), for example Season 1, episode 3:
+The same command works on Windows, macOS and Linux. Pick the season with `--season`. To try it on a single episode first (recommended), for example Season 1, episode 3:
 
 ```bash
-SEASON=1 ./run.sh 3
+uv run -m screenscan --season 1 3
 ```
 
 Run a few episodes:
 
 ```bash
-SEASON=1 ./run.sh 3 4 5
+uv run -m screenscan --season 1 3 4 5
 ```
 
 Run the whole season:
 
 ```bash
-SEASON=1 ./run.sh
+uv run -m screenscan --season 1
 ```
 
-(If you see `permission denied`, run `bash run.sh` instead of `./run.sh`, for example `SEASON=1 bash run.sh 3`.)
+(On macOS and Linux the older form `SEASON=1 ./run.sh 3` still works too.)
 
 The first run takes a while: `uv` installs everything, then the two models are downloaded, and then the stages run one after another. The screen shows a line such as `=== 22:10:03 verify` as each stage starts.
 
@@ -206,7 +217,7 @@ output/season01/
       ...
 ```
 
-Open `review.html` by double-clicking it, or run `open output/season01/review.html` on a Mac. Each PNG's file name ends in its timestamp as `MM-SS` (a colon can't be used in file names), and the spreadsheet shows it as `MM:SS`.
+Open `review.html` by double-clicking it, or run `start output\season01\review.html` on Windows or `open output/season01/review.html` on a Mac. Each PNG's file name ends in its timestamp as `MM-SS` (a colon can't be used in file names), and the spreadsheet shows it as `MM:SS`.
 
 Running a subset of episodes rewrites `screens.xlsx` and `review.html` with **only those episodes**. Run the whole season (or the same set of episodes) again to get a complete sheet.
 
@@ -221,9 +232,10 @@ Running a subset of episodes rewrites `screens.xlsx` and `review.html` with **on
 | `... 402 ...` or "insufficient credits" | Your OpenRouter balance is empty. Add credit on <https://openrouter.ai/settings/credits>, then run the same command again. |
 | A few `VLM error on job N` lines, then the run continues | Normal for the occasional network hiccup or bad response. Failed items are not saved, so they are retried automatically the next time you run the same command. |
 | `Event loop is closed` messages | Harmless noise from closing network connections. Ignore them. |
-| `uv: command not found` | Close and reopen the terminal after installing `uv`. |
+| `uv: command not found` (or `uv is not recognized` on Windows) | Close and reopen the terminal after installing `uv`. |
+| Very slow on a Windows or Linux PC with an NVIDIA card | The GPU is not being used. Update the NVIDIA driver (the bundled CUDA 13 needs a recent one), then check with `uv run python -c "import torch; print(torch.cuda.is_available())"`; it should print `True`. |
 | Out of disk space | Each season needs about 20–25 GB in the `work/` folder. After the output is finished and checked you may delete `work/` to reclaim space (you will have to recompute everything if you run that season again). |
-| Slow on a Mac | Expected: the local stages run on the Apple GPU (or the CPU) instead of an NVIDIA card. To force the CPU if you see GPU errors: `SCREENSCAN_DEVICE=cpu SEASON=1 ./run.sh 3`. |
+| Slow on a Mac | Expected: the local stages run on the Apple GPU (or the CPU) instead of an NVIDIA card. To force the CPU if you see GPU errors: `uv run -m screenscan --season 1 --device cpu 3`. |
 
 ## Good to know
 
@@ -231,4 +243,5 @@ Running a subset of episodes rewrites `screens.xlsx` and `review.html` with **on
 - **Older footage is softer**, so small on-screen text can be harder to read in Season 1.
 - **Using a different AI backend:** any OpenAI-compatible service that accepts images works. Change `VLM_BASE_URL`, `VLM_MODEL` and `VLM_API_KEY` in `.env`. `.env` also has a commented-out block for a local vLLM server (Linux with an NVIDIA GPU only).
 - **Tuning:** the thresholds live at the top of `screenscan/select.py` (`APPEARANCE_GAP_S`, `APPEARANCE_MIN_SIM`) and `screenscan/verify.py` (`MARGIN_THRESHOLD`, `OWL_THRESHOLD`).
-- **Running one stage on its own:** `SEASON=1 uv run -m screenscan.verify 3` (stages: `sample`, `siglip`, `shared`, `detect`, `verify`, `refine`, `select`, `export`).
+- **Running only some stages:** `uv run -m screenscan --season 1 --only verify,refine 3` (stages: `sample`, `siglip`, `shared`, `detect`, `verify`, `refine`, `select`, `export`; they always run in that order).
+- **Windows symlink warning:** on the first model download you may see a Hugging Face warning about symlinks. It is harmless; it only means the model cache uses a little more disk space. Turning on Windows Developer Mode makes it go away.

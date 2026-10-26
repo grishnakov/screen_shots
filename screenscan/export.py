@@ -92,9 +92,9 @@ def build_xlsx(rows: list[tuple[Episode, dict]]) -> None:
 def build_review(rows: list[tuple[Episode, dict]]) -> None:
     cards = []
     for ep, a in rows:
-        rel = png_path(ep, a["ms"]).relative_to(OUTPUT_DIR)
+        rel = html.escape(png_path(ep, a["ms"]).relative_to(OUTPUT_DIR).as_posix())  # URLs need "/" even on Windows
         cards.append(
-            f'<figure><a href="{html.escape(str(rel))}"><img loading="lazy" src="{html.escape(str(rel))}"></a>'
+            f'<figure><a href="{rel}"><img loading="lazy" src="{rel}"></a>'
             f"<figcaption><b>{ep.code} {fmt_ts(a['ms'])}</b> &middot; {html.escape(a['type'])}, {html.escape(a['prominence'])}"
             f"<br>{html.escape(a['what'])}<br><small>{a['n_frames']} frames in appearance, "
             f"{fmt_ts(a['start_ms'])}&ndash;{fmt_ts(a['end_ms'])}</small></figcaption></figure>"
@@ -105,7 +105,8 @@ def build_review(rows: list[tuple[Episode, dict]]) -> None:
         ".g{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:12px}"
         "figure{margin:0;background:#1c1c1c;padding:8px;border-radius:6px}img{width:100%;display:block}"
         "figcaption{padding-top:6px}small{color:#888}a{color:inherit}</style>"
-        f"<h2>{len(rows)} screen appearances</h2><div class=g>{''.join(cards)}</div>"
+        f"<h2>{len(rows)} screen appearances</h2><div class=g>{''.join(cards)}</div>",
+        encoding="utf-8",
     )
 
 
@@ -119,14 +120,14 @@ def main() -> None:
         if not path.exists():
             print(f"{ep.code}: no appearances.json, skipping")
             continue
-        apps = json.loads(path.read_text())
+        apps = json.loads(path.read_text(encoding="utf-8"))
         export_pngs(ep, apps)
         rows += [(ep, a) for a in apps]
         print(f"{ep.code}: {len(apps)} screenshots", flush=True)
     OUTPUT_DIR.mkdir(exist_ok=True)
     build_xlsx(rows)
     build_review(rows)
-    print(f"wrote {OUTPUT_DIR}/screens.xlsx and review.html ({len(rows)} rows)")
+    print(f"wrote {OUTPUT_DIR / 'screens.xlsx'} and review.html ({len(rows)} rows)")
 
 
 if __name__ == "__main__":

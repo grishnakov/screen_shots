@@ -87,7 +87,7 @@ def detect_episode(ep: Episode, model, proc, force: bool = False, batch: int = 8
                     }
                 )
             result[str(m)] = boxes
-    out.write_text(json.dumps(result))
+    out.write_text(json.dumps(result), encoding="utf-8")
     hits = sum(1 for v in result.values() if v)
     return f"{ep.code}: {len(reps)} shot frames, {hits} with detections"
 

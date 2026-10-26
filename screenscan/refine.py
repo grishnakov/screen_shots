@@ -93,7 +93,7 @@ def screen_jobs(ep: Episode, ms: int, screens: list[dict]) -> list:
 def refine_episode(ep: Episode) -> str:
     vlm = load_done(ep.work / "vlm.jsonl")
     out = ep.work / "refine.jsonl"
-    done = {(r["ms"], r["idx"]) for r in map(json.loads, out.read_text().splitlines())} if out.exists() else set()
+    done = {(r["ms"], r["idx"]) for r in map(json.loads, out.read_text(encoding="utf-8").splitlines())} if out.exists() else set()
 
     keys, jobs = [], []
     for ms, rec in sorted(vlm.items()):
@@ -104,7 +104,7 @@ def refine_episode(ep: Episode) -> str:
         keys += [(ms, i) for i, _ in todo]
 
     if jobs:
-        with out.open("a") as f:
+        with out.open("a", encoding="utf-8") as f:
 
             def save(j: int, result: dict | None) -> None:
                 if result is not None:
@@ -117,7 +117,7 @@ def refine_episode(ep: Episode) -> str:
 
 def load_refined(ep: Episode) -> dict[tuple[int, int], dict]:
     path = ep.work / "refine.jsonl"
-    return {(r["ms"], r["idx"]): r for r in map(json.loads, path.read_text().splitlines())} if path.exists() else {}
+    return {(r["ms"], r["idx"]): r for r in map(json.loads, path.read_text(encoding="utf-8").splitlines())} if path.exists() else {}
 
 
 def main() -> None:

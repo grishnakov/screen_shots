@@ -21,9 +21,10 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-# CUDA wheels on Linux only; macOS (Apple silicon, MPS) and Windows use the default PyPI wheels.
-torch = { index = "pytorch-cu130", marker = "sys_platform == 'linux'" }
-torchvision = { index = "pytorch-cu130", marker = "sys_platform == 'linux'" }
+# CUDA wheels on Linux and Windows (PyPI's Windows torch is CPU-only); macOS (Apple silicon, MPS) uses PyPI.
+# The CUDA wheels still fall back to the CPU on machines without an NVIDIA GPU.
+torch = { index = "pytorch-cu130", marker = "sys_platform == 'linux' or sys_platform == 'win32'" }
+torchvision = { index = "pytorch-cu130", marker = "sys_platform == 'linux' or sys_platform == 'win32'" }
 
 [[tool.uv.index]]
 name = "pytorch-cu130"

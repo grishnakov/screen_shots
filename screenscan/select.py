@@ -102,7 +102,7 @@ def select_episode(ep: Episode, gap_s: float = APPEARANCE_GAP_S) -> list[dict]:
                 "box": s["box"],
             }
         )
-    (ep.work / "appearances.json").write_text(json.dumps(out, indent=1))
+    (ep.work / "appearances.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
     return out
 
 

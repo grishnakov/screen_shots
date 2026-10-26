@@ -42,7 +42,7 @@ Only filenames containing an `SxxEyy` tag are recognized.
 From the project folder, this lists the episodes the program found and the file each one matched. Replace the `1` with the season number you want to check:
 
 ```bash
-SEASON=1 uv run python -c "from screenscan.config import episodes; [print(e.code, '|', e.title, '|', e.video.name) for e in episodes()]"
+uv run -m screenscan --season 1 --list
 ```
 
 If an episode is missing from the list, its file name does not follow the rules above. Then see the main [README](../README.md) for how to run the analysis.

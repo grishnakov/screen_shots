@@ -58,7 +58,7 @@ def pick_representatives(ep: Episode, run: list[int]) -> list[int]:
 def load_done(path) -> dict[int, dict]:
     done = {}
     if path.exists():
-        for line in path.read_text().splitlines():
+        for line in path.read_text(encoding="utf-8").splitlines():
             r = json.loads(line)
             done[r["ms"]] = r
     return done
@@ -78,7 +78,7 @@ def verify_episode(ep: Episode, audit: int = 0, threshold: float = MARGIN_THRESH
     owl_path = ep.work / "owl.json"
     if owl_path.exists():
         # Small / background screens the whole-frame scorer misses: any shot frame OWLv2 fired on.
-        for k, dets in json.loads(owl_path.read_text()).items():
+        for k, dets in json.loads(owl_path.read_text(encoding="utf-8")).items():
             if any(d["score"] >= OWL_THRESHOLD for d in dets):
                 wanted.setdefault(int(k), "owl")
     if audit:
@@ -94,7 +94,7 @@ def verify_episode(ep: Episode, audit: int = 0, threshold: float = MARGIN_THRESH
     if todo:
         bar = tqdm(total=len(todo), desc=ep.code, mininterval=10)
         # Append each verdict as it arrives so an interrupted run resumes where it stopped.
-        with out.open("a") as f:
+        with out.open("a", encoding="utf-8") as f:
 
             def save(i: int, result: dict | None) -> None:
                 if result is not None:
