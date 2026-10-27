@@ -124,7 +124,7 @@ def main() -> None:
         export_pngs(ep, apps)
         rows += [(ep, a) for a in apps]
         print(f"{ep.code}: {len(apps)} screenshots", flush=True)
-    OUTPUT_DIR.mkdir(exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     build_xlsx(rows)
     build_review(rows)
     print(f"wrote {OUTPUT_DIR / 'screens.xlsx'} and review.html ({len(rows)} rows)")
